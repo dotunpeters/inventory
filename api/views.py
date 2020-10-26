@@ -103,7 +103,9 @@ def user_register(request):
 @api_view(['POST'])
 def tank_create(request):
     try:
-        serializer = TankSerializer(data=request.data)
+        user = request.user
+        tank = Tank(owner=user)
+        serializer = TankSerializer(tank, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -112,7 +114,7 @@ def tank_create(request):
                 )
         else:
             return Response(
-                data={"error": "invalid data passed"},
+                data={"error": "invalid data"},
                 status=status.HTTP_501_NOT_IMPLEMENTED
                 )
     except Exception as e:
@@ -122,7 +124,7 @@ def tank_create(request):
             )
 
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def tank_update(request):
     try:
         value = Tank.objects.get(pk=request.data['id'])

@@ -6,7 +6,7 @@ from .models import Tank, User
 class TankSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tank
-        fields = '__all__'
+        fields = ['tank_name', 'product', 'capacity']
 
 
 class UserSerializer(serializers.ModelSerializer):
