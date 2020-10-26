@@ -7,6 +7,9 @@ from rest_framework.decorators import api_view
 from .models import User, Tank
 from .serializers import TankSerializer, UserSerializer, RegisterSerializer
 
+# JWT Authentication
+from rest_framework_simplejwt.tokens import RefreshToken
+
 # Create your views here.
 
 
@@ -73,9 +76,16 @@ def user_register(request):
     try:
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            data = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'username': request.POST['username'],
+                'email': request.POST['email']
+                }
             return Response(
-                data=serializer.validated_data,
+                data=data,
                 status=status.HTTP_201_CREATED
                 )
         else:
@@ -88,16 +98,6 @@ def user_register(request):
             data={"error": f"{e}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-
-@api_view(['POST'])
-def user_login(request):
-    pass
-
-
-@api_view(['POST'])
-def user_logout(request):
-    pass
 
 
 @api_view(['POST'])
